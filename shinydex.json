@@ -1,6 +1,6 @@
 [
   {
-    "numero": "019",
+    "numero": 19,
     "nom": "Rattata",
     "surnom": "Ratatouille",
     "sexe": "Femelle",
@@ -8,11 +8,11 @@
     "methode": "Reset",
     "jeu": "Soleil",
     "ball": "Soin Ball",
-    "rencontre": "25 reset",
+    "rencontre": 25 reset,
     "image": "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/rattata.png"
   },
   {
-    "numero": "045",
+    "numero": 045,
     "nom": "Rafflesia",
     "surnom": "Bourgeon",
     "sexe": "Mâle",
@@ -20,7 +20,7 @@
     "methode": "Random encounter",
     "jeu": "Pokémon X",
     "ball": "Soin Ball",
-    "rencontre": "5815",
+    "rencontre": 5815,
     "image": "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/vileplume.png"
   }
 ]
