@@ -1,147 +1,127 @@
-// Liste des noms de Pokémon (exemple partiel, à compléter avec tous les noms nécessaires)
-const pokemonNames = {
-  "001": "bulbasaur",
-  "002": "ivysaur",
-  "003": "venusaur",
-  "004": "charmander",
-  "005": "charmeleon",
-  "006": "charizard",
-  "007": "squirtle",
-  "008": "wartortle",
-  "009": "blastoise",
-  "019": "rattata",
-  "045": "vileplume",
-  // ... ajoute les autres numéros et noms ici
-};
+const nationalDexTotal = 1010; // nombre total de Pokémon dans le Pokédex national
 
-function getPokemonName(numStr) {
-  return pokemonNames[numStr] || "missingno";
+let shinies = []; // liste des shinies chargés
+
+// Charge les shinies depuis le JSON
+async function loadShinies() {
+  try {
+    const response = await fetch('shinydex.json');
+    if (!response.ok) throw new Error("Fichier shinydex.json introuvable");
+
+    shinies = await response.json();
+    afficherShinies();
+    afficherProgression();
+    afficherManquants();
+  } catch (e) {
+    document.getElementById('pokemon-container').innerHTML = `<p style="color:red">${e.message}</p>`;
+  }
 }
 
-const nationalDexTotal = 1010;
-let shinies = [];
+// Affiche la progression (nombre de shinies / total)
+function afficherProgression() {
+  const progression = ((shinies.length / nationalDexTotal) * 100).toFixed(1);
+  document.getElementById('progression').innerHTML = `Progression : ${shinies.length} / ${nationalDexTotal} (${progression}%)`;
+}
 
-// Fonction pour afficher les shinys attrapés
-function displayCaughtShinies() {
+// Affiche les cartes shinies dans l’onglet shinydex
+function afficherShinies() {
   const container = document.getElementById('pokemon-container');
   container.innerHTML = '';
-
   shinies.forEach(pokemon => {
     const card = document.createElement('div');
     card.className = 'shiny-card';
     card.innerHTML = `
       <img src="${pokemon.image}" alt="${pokemon.nom}" />
-      <h4>#${pokemon.numero} ${pokemon.nom}</h4>
-      <p><strong>Surnom :</strong> ${pokemon.surnom}</p>
-      <p><strong>Sexe :</strong> ${pokemon.sexe}</p>
-      <p><strong>Date :</strong> ${pokemon.date}</p>
-      <p><strong>Méthode :</strong> ${pokemon.methode}</p>
-      <p><strong>Jeu :</strong> ${pokemon.jeu}</p>
-      <p><strong>Ball :</strong> ${pokemon.ball}</p>
-      <p><strong>Rencontres :</strong> ${pokemon.rencontre}</p>
+      <div>
+        <h4>#${pokemon.numero} ${pokemon.nom}</h4>
+        <p><strong>Surnom :</strong> ${pokemon.surnom}</p>
+        <p><strong>Sexe :</strong> ${pokemon.sexe}</p>
+        <p><strong>Date :</strong> ${pokemon.date}</p>
+        <p><strong>Méthode :</strong> ${pokemon.methode}</p>
+        <p><strong>Jeu :</strong> ${pokemon.jeu}</p>
+        <p><strong>Ball :</strong> ${pokemon.ball}</p>
+        <p><strong>Rencontres :</strong> ${pokemon.rencontre}</p>
+      </div>
     `;
     container.appendChild(card);
   });
-
-  // Mise à jour de la progression
-  const totalShinies = shinies.length;
-  const progression = ((totalShinies / nationalDexTotal) * 100).toFixed(1);
-  document.getElementById('progression').innerHTML = `
-    <h3>Progression : ${totalShinies} / ${nationalDexTotal} (${progression}%)</h3>
-  `;
 }
 
-// Fonction pour générer la liste des Pokémon manquants avec image et nom
-function generateMissingList() {
-  const missingList = document.getElementById('missing-pokemon-list');
-  missingList.innerHTML = '';
+// Affiche la liste des pokémons manquants
+function afficherManquants() {
+  const tbody = document.getElementById('missing-pokemon-list');
+  tbody.innerHTML = '';
 
-  const caughtSet = new Set(shinies.map(p => p.numero));
+  // On crée un Set des numéros de pokémon shiny capturés pour accélérer la recherche
+  const shinyNums = new Set(shinies.map(s => s.numero));
 
-  for (let i = 1; i <= nationalDexTotal; i++) {
+  // On affiche tous les pokémons manquants
+  for(let i=1; i<=nationalDexTotal; i++) {
     const numStr = i.toString().padStart(3, '0');
-    if (!caughtSet.has(numStr)) {
-      const name = getPokemonName(numStr);
-      const imageUrl = `https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/${name}.png`;
-
+    if (!shinyNums.has(numStr)) {
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><img src="${imageUrl}" alt="Pokémon #${numStr}" style="width:40px; height:40px;"></td>
-        <td>#${numStr}</td>
-        <td>${name}</td>
-      `;
-      missingList.appendChild(tr);
+      tr.innerHTML = `<td>#${numStr}</td><td>Pokémon #${numStr}</td>`;
+      tbody.appendChild(tr);
     }
   }
 }
 
-// Fonction pour charger la liste des shinys depuis le JSON
-async function loadShinies() {
-  try {
-    const response = await fetch('shinydex.json');
-    if (!response.ok) throw new Error("Fichier shinydex.json introuvable ou inaccessible");
-
-    shinies = await response.json();
-
-    // Afficher les shinys et la liste manquante
-    displayCaughtShinies();
-    generateMissingList();
-
-  } catch (error) {
-    document.getElementById('pokemon-container').innerHTML = `
-      <p style="color: red;">Erreur : ${error.message}</p>
-    `;
-  }
+// Gère le changement d’onglet
+function setupTabs() {
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabId = tab.dataset.tab;
+      document.querySelectorAll('.tab-content').forEach(tc => {
+        tc.style.display = (tc.id === tabId) ? 'block' : 'none';
+      });
+    });
+  });
 }
 
-// Fonction pour créer l’URL de l’image shiny lors de l’ajout manuel
-function createImageUrl(numStr) {
-  const name = getPokemonName(numStr);
-  return `https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/${name}.png`;
-}
-
-// Gestionnaire du formulaire d’ajout
-function setupAddShinyForm() {
+// Ajoute un nouveau shiny depuis le formulaire
+function setupForm() {
   const form = document.getElementById('add-shiny-form');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', e => {
     e.preventDefault();
-
     const formData = new FormData(form);
-    const numero = formData.get('pokedex').toString().padStart(3, '0');
-    const nom = formData.get('nom');
-    const surnom = formData.get('surnom');
-    const sexe = formData.get('sexe');
-    const date = formData.get('date');
-    const methode = formData.get('methode');
-    const jeu = formData.get('jeu');
-    const ball = formData.get('ball');
-    const rencontre = formData.get('rencontre');
-
-    // Créer l'objet shiny à ajouter
     const newShiny = {
-      numero: numero,
-      nom: nom,
-      surnom: surnom,
-      sexe: sexe,
-      date: date,
-      methode: methode,
-      jeu: jeu,
-      ball: ball,
-      rencontre: rencontre,
-      image: createImageUrl(numero)
+      numero: formData.get('pokedex').padStart(3, '0'),
+      nom: formData.get('nom'),
+      surnom: formData.get('surnom'),
+      sexe: formData.get('sexe'),
+      date: formData.get('date'),
+      methode: formData.get('methode'),
+      jeu: formData.get('jeu'),
+      ball: formData.get('ball'),
+      rencontre: formData.get('rencontre'),
+      image: getImageUrl(formData.get('nom')) // fonction pour générer l'url de l'image shiny
     };
-
-    // Ajouter au tableau et rafraîchir affichage
+    // Vérifie que ce shiny n’existe pas déjà
+    if(shinies.some(s => s.numero === newShiny.numero)) {
+      alert('Ce Pokémon shiny est déjà enregistré.');
+      return;
+    }
     shinies.push(newShiny);
-    displayCaughtShinies();
-    generateMissingList();
-
+    afficherShinies();
+    afficherProgression();
+    afficherManquants();
     form.reset();
   });
 }
 
-// Au chargement de la page
+// Fonction simple pour créer une URL d’image shiny à partir du nom (tu peux adapter selon ta source d’images)
+function getImageUrl(nom) {
+  // ex : https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/rattata.png
+  // convertit nom en minuscules et remplace espaces par tirets
+  const formatted = nom.toLowerCase().replace(/ /g, '-');
+  return `https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/${formatted}.png`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadShinies();
-  setupAddShinyForm();
+  setupTabs();
+  setupForm();
 });
