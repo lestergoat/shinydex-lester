@@ -5,24 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shinydex Lester</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #ef5350;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+    .tab-button {
+      background: #ef5350;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .tab-button.active, .tab-button:hover {
+      background: #d32f2f;
+    }
+    .tab-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .shiny-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #fff9f9;
+    }
+    .shiny-card img {
+      width: 80px;
+      height: 80px;
+    }
+    .shiny-card div {
+      flex-grow: 1;
+    }
+    #progression {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #ef5350;
+    }
+    /* Table style for missing pokemons */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #ef5350;
+      color: white;
+      border-radius: 8px 8px 0 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Shinydex-Lester</h1>
-  <form id="add-shiny-form" style="margin-bottom: 30px; background: #fff9f9; padding: 15px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    <h3>Ajouter un shiny</h3>
-    <input name="pokedex" type="number" placeholder="Numéro Pokédex" required />
-    <input name="nom" type="text" placeholder="Nom" required />
-    <input name="surnom" type="text" placeholder="Surnom" required />
-    <input name="sexe" type="text" placeholder="Sexe" required />
-    <input name="date" type="text" placeholder="Date (jj mm aaaa)" required />
-    <input name="methode" type="text" placeholder="Méthode" required />
-    <input name="jeu" type="text" placeholder="Jeu" required />
-    <input name="ball" type="text" placeholder="Ball" required />
-    <input name="rencontre" type="number" placeholder="Nombre de rencontres" required />
-    <button type="submit" style="margin-top: 10px; padding: 10px 20px; background: #ef5350; color: white; border: none; border-radius: 8px; cursor: pointer;">Ajouter</button>
-  </form>
-  <div id="pokemon-container"></div>
-  <div id="progression"></div>
+  <h1>Shinydex Lester</h1>
+
+  <div class="tabs">
+    <button class="tab-button active" data-tab="shinydex-view">Shinydex</button>
+    <button class="tab-button" data-tab="pokedex-view">Pokédex manquants</button>
+  </div>
+
+  <div id="shinydex-view" class="tab-content">
+    <div id="progression"></div>
+    <div id="pokemon-container"></div>
+  </div>
+
+  <div id="pokedex-view" class="tab-content" style="display:none;">
+    <h3>Pokémons manquants</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nom</th>
+        </tr>
+      </thead>
+      <tbody id="missing-pokemon-list">
+        <!-- Liste des pokémons manquants ici -->
+      </tbody>
+    </table>
+  </div>
+
   <script src="script.js" defer></script>
 </body>
-</html>
