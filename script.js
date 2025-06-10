@@ -1,4 +1,4 @@
-// Données de base (shinies ajoutés)
+de// Données de base (shinies ajoutés)
 let shinies = [];
 
 // Données pokédex complètes (exemple, à compléter ou charger d’un JSON)
@@ -221,3 +221,17 @@ function creerFiltres() {
   selectMethode.innerHTML = methodes.map(m => `<option>${m}</option>`).join("");
   filtresDiv.appendChild(creerLabelSelect("Méthode", selectMethode));
   selectM
+// Gestion des onglets
+document.querySelectorAll('.tab-button').forEach(button => {
+  button.addEventListener('click', () => {
+    const tab = button.dataset.tab;
+
+    // Retire la classe active de tous les boutons
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    // Cache tout le contenu
+    document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+
+    // Active le bon onglet
+    button.classList.add('active');
+    document.getElementById(tab).style.display = 'block';
+  });
