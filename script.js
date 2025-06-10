@@ -12,3 +12,4 @@ fetch("pokedex.json")
   });
 
 // Le reste du JS peut être ajouté ici (déjà fourni)
+npx serve .
