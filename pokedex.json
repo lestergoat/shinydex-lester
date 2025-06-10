@@ -5,3 +5,4 @@
   { "numero": "006", "nom": "Dracaufeu", "versions": ["normal", "mega"], "type": ["Feu", "Vol"] },
   { "numero": "483", "nom": "Dialga", "versions": ["normal"], "type": ["Acier", "Dragon"] }
 ]
+npx serve .
