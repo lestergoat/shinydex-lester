@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shinydex Lester</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Shinydex Lester</h1>
+
+  <div class="tabs">
+    <button class="tab-button active" data-tab="shinydex-view">Shinydex</button>
+    <button class="tab-button" data-tab="pokedex-view">Pokédex manquants</button>
+  </div>
+
+  <div id="shinydex-view" class="tab-content">
+    <div id="progression"></div>
+    <div id="filters">
+      <label for="filter-jeu">Filtrer par jeu :</label>
+      <select id="filter-jeu">
+        <option value="">Tous</option>
+      </select>
+      <label for="filter-methode">Filtrer par méthode :</label>
+      <select id="filter-methode">
+        <option value="">Tous</option>
+      </select>
+    </div>
+    <form id="add-shiny-form">
+      <h3>Ajouter un shiny</h3>
+      <input name="numero" type="number" placeholder="Numéro Pokédex" required />
+      <input name="nom" type="text" placeholder="Nom" required />
+      <input name="surnom" type="text" placeholder="Surnom" />
+      <input name="sexe" type="text" placeholder="Sexe" />
+      <input name="date" type="text" placeholder="Date (jj mm aaaa)" />
+      <input name="methode" type="text" placeholder="Méthode" />
+      <input name="jeu" type="text" placeholder="Jeu" />
+      <input name="ball" type="text" placeholder="Ball" />
+      <input name="rencontre" type="number" placeholder="Nombre de rencontres" />
+      <input name="lieu" type="text" placeholder="Lieu d'obtention" />
+      <select name="version" required>
+        <option value="">Version</option>
+        <option value="normal">Normal</option>
+        <option value="alola">Alola</option>
+        <option value="galar">Galar</option>
+      </select>
+      <button type="submit">Ajouter</button>
+    </form>
+    <div id="pokemon-container"></div>
+  </div>
+
+  <div id="pokedex-view" class="tab-content" style="display:none;">
+    <h3>Pokémons manquants</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nom</th>
+          <th>Version</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="missing-pokemon-list"></tbody>
+    </table>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
