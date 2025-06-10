@@ -3,6 +3,14 @@ let shinies = [];
 
 // Exemple pokedex (à compléter ou charger d’un JSON)
 const pokedex = [
+ fetch('pokedex.json')
+  .then(res => res.json())
+  .then(data => {
+    pokedex.push(...data);
+    afficherShinies();
+    afficherPokedexManquants();
+  })
+  .catch(err => console.error("Erreur de chargement du pokedex :", err)) 
   { numero: "001", nom: "Bulbizarre", versions: ["normal", "alola"], type: ["Plante", "Poison"] },
   { numero: "019", nom: "Rattata", versions: ["normal", "alola"], type: ["Normal"] },
   { numero: "045", nom: "Rafflesia", versions: ["normal"], type: ["Plante", "Poison"] },
