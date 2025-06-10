@@ -16,18 +16,24 @@
 
   <div id="shinydex-view" class="tab-content">
     <div id="progression"></div>
+
     <div id="filters">
       <label for="filter-jeu">Filtrer par jeu :</label>
       <select id="filter-jeu">
-        <option value="">Tous</option>
-        <!-- options dynamiques -->
+        <option value="Tous">Tous</option>
       </select>
+
       <label for="filter-methode">Filtrer par méthode :</label>
       <select id="filter-methode">
-        <option value="">Tous</option>
-        <!-- options dynamiques -->
+        <option value="Tous">Tous</option>
+      </select>
+
+      <label for="filter-type">Filtrer par type :</label>
+      <select id="filter-type">
+        <option value="Tous">Tous</option>
       </select>
     </div>
+
     <form id="add-shiny-form">
       <h3>Ajouter un shiny</h3>
       <input name="numero" type="number" placeholder="Numéro Pokédex" required />
@@ -45,6 +51,7 @@
         <option value="normal">Normal</option>
         <option value="alola">Alola</option>
         <option value="galar">Galar</option>
+        <option value="mega">Méga</option>
       </select>
       <button type="submit">Ajouter</button>
     </form>
