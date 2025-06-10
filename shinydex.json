@@ -1,0 +1,34 @@
+[
+  {
+    "numero": "019",
+    "nom": "Rattata",
+    "surnom": "Ratatouille",
+    "sexe": "Femelle",
+    "date": "27-05-2025",
+    "methode": "Reset",
+    "jeu": "Soleil",
+    "ball": "Soin Ball",
+    "rencontre": "25",
+    "image": "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/rattata.png",
+    "version": "Standard",
+    "lieu": "Route 1",
+    "type": ["Normal"],
+    "evolution": "Rattata → Rattatac"
+  },
+  {
+    "numero": "045",
+    "nom": "Rafflesia",
+    "surnom": "Bourgeon",
+    "sexe": "Mâle",
+    "date": "07-05-2024",
+    "methode": "Random encounter",
+    "jeu": "Pokémon X",
+    "ball": "Soin Ball",
+    "rencontre": "5815",
+    "image": "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/vileplume.png",
+    "version": "Standard",
+    "lieu": "Forêt de Kalos",
+    "type": ["Plante", "Poison"],
+    "evolution": "Bourrinos → Rafflesia"
+  }
+]
