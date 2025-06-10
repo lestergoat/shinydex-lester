@@ -1,14 +1,14 @@
-de// Données de base (shinies ajoutés)
+// Données de base (shinies ajoutés)
 let shinies = [];
 
-// Données pokédex complètes (exemple, à compléter ou charger d’un JSON)
+// Exemple pokedex (à compléter ou charger d’un JSON)
 const pokedex = [
   { numero: "001", nom: "Bulbizarre", versions: ["normal", "alola"], type: ["Plante", "Poison"] },
   { numero: "019", nom: "Rattata", versions: ["normal", "alola"], type: ["Normal"] },
   { numero: "045", nom: "Rafflesia", versions: ["normal"], type: ["Plante", "Poison"] },
   { numero: "006", nom: "Dracaufeu", versions: ["normal", "mega"], type: ["Feu", "Vol"] },
   { numero: "483", nom: "Dialga", versions: ["normal"], type: ["Acier", "Dragon"] },
-  // ... compléter la liste réelle ...
+  // ... à compléter ...
 ];
 
 // Filtres appliqués
@@ -44,13 +44,13 @@ function creerCarte(pokemon, index) {
     <img src="${pokemon.image}" alt="${pokemon.nom}" />
     <div class="info">
       <h4>#${pokemon.numero} ${pokemon.nom} (${pokemon.version || "normal"})</h4>
-      <p><strong>Surnom :</strong> ${pokemon.surnom}</p>
-      <p><strong>Sexe :</strong> ${pokemon.sexe}</p>
-      <p><strong>Date :</strong> ${pokemon.date}</p>
-      <p><strong>Méthode :</strong> ${pokemon.methode}</p>
-      <p><strong>Jeu :</strong> ${pokemon.jeu}</p>
-      <p><strong>Ball :</strong> <img src="${pokemon.ballImage || ''}" alt="${pokemon.ball}" style="width:24px; vertical-align:middle;"> ${pokemon.ball}</p>
-      <p><strong>Rencontres :</strong> ${pokemon.rencontre}</p>
+      <p><strong>Surnom :</strong> ${pokemon.surnom || "-"}</p>
+      <p><strong>Sexe :</strong> ${pokemon.sexe || "-"}</p>
+      <p><strong>Date :</strong> ${pokemon.date || "-"}</p>
+      <p><strong>Méthode :</strong> ${pokemon.methode || "-"}</p>
+      <p><strong>Jeu :</strong> ${pokemon.jeu || "-"}</p>
+      <p><strong>Ball :</strong> <img src="${pokemon.ballImage || ''}" alt="${pokemon.ball || ''}" style="width:24px; vertical-align:middle;"> ${pokemon.ball || "-"}</p>
+      <p><strong>Rencontres :</strong> ${pokemon.rencontre || 0}</p>
       <p><strong>Lieu d'obtention :</strong> ${pokemon.lieu || 'Inconnu'}</p>
       <button data-index="${index}" class="edit-btn">Modifier</button>
     </div>
@@ -75,7 +75,7 @@ function afficherShinies() {
 
   afficherProgression();
 
-  // Ajouter gestion modification
+  // Ajout gestion modification
   document.querySelectorAll(".edit-btn").forEach(btn => {
     btn.onclick = () => {
       ouvrirFormulaireEdition(btn.dataset.index);
@@ -88,14 +88,16 @@ function afficherPokedexManquants() {
   tbody.innerHTML = "";
 
   // Numéros shiny capturés
-  const capturés = new Set(shinies.map(p => p.numero));
+  const captures = new Set(shinies.map(p => p.numero));
 
   pokedex.forEach(p => {
-    if (!capturés.has(p.numero)) {
+    if (!captures.has(p.numero)) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${p.numero}</td>
         <td>${p.nom}</td>
+        <td>${p.versions.join(", ")}</td>
+        <td>${p.type.join(", ")}</td>
       `;
       tbody.appendChild(tr);
     }
@@ -108,15 +110,15 @@ function ouvrirFormulaireEdition(index) {
   const form = document.getElementById("add-shiny-form");
   form.dataset.editIndex = index;
 
-  form.pokedex.value = pokemon.numero;
+  form.numero.value = pokemon.numero;
   form.nom.value = pokemon.nom;
-  form.surnom.value = pokemon.surnom;
-  form.sexe.value = pokemon.sexe;
-  form.date.value = pokemon.date;
-  form.methode.value = pokemon.methode;
-  form.jeu.value = pokemon.jeu;
-  form.ball.value = pokemon.ball;
-  form.rencontre.value = pokemon.rencontre;
+  form.surnom.value = pokemon.surnom || "";
+  form.sexe.value = pokemon.sexe || "";
+  form.date.value = pokemon.date || "";
+  form.methode.value = pokemon.methode || "";
+  form.jeu.value = pokemon.jeu || "";
+  form.ball.value = pokemon.ball || "";
+  form.rencontre.value = pokemon.rencontre || 0;
   form.lieu.value = pokemon.lieu || "";
   form.version.value = pokemon.version || "normal";
 
@@ -128,7 +130,7 @@ function ajouterOuModifierShiny(event) {
   const form = event.target;
 
   const nouveauPokemon = {
-    numero: form.pokedex.value,
+    numero: form.numero.value,
     nom: form.nom.value,
     surnom: form.surnom.value,
     sexe: form.sexe.value,
@@ -137,11 +139,17 @@ function ajouterOuModifierShiny(event) {
     jeu: form.jeu.value,
     ball: form.ball.value,
     ballImage: getBallImage(form.ball.value),
-    rencontre: form.rencontre.value,
+    rencontre: Number(form.rencontre.value) || 0,
     lieu: form.lieu.value,
     version: form.version.value,
     image: getPokemonImage(form.numero.value, form.version.value)
   };
+
+  // Ajout du type pour filtrage (récupération depuis pokedex)
+  const dexEntry = pokedex.find(p => p.numero === nouveauPokemon.numero);
+  if (dexEntry) {
+    nouveauPokemon.type = dexEntry.type;
+  }
 
   if (form.dataset.editIndex !== undefined) {
     shinies[form.dataset.editIndex] = nouveauPokemon;
@@ -158,7 +166,6 @@ function ajouterOuModifierShiny(event) {
 
 function getPokemonImage(numero, version) {
   const baseUrl = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/shiny/";
-  // Exemple simple: on ajoute version dans URL si besoin, sinon normal
   if (version && version !== "normal") {
     if (version === "alola") {
       return baseUrl + "alolan/" + padNumero(numero) + ".png";
@@ -166,18 +173,20 @@ function getPokemonImage(numero, version) {
     if (version === "mega") {
       return baseUrl + "mega/" + padNumero(numero) + ".png";
     }
+    if (version === "galar") {
+      // Exemple: tu peux ajuster l'url pour Galar ici si besoin
+      return baseUrl + "galarian/" + padNumero(numero) + ".png";
+    }
   }
   return baseUrl + padNumero(numero) + ".png";
 }
 
 function getBallImage(ballName) {
-  // Simple mapping, à enrichir avec URL réelles des images de balls
   const balls = {
     "Soin Ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/safariball.png",
     "Poké Ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pokeball.png",
     "Super Ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/greatball.png",
     "Hyper Ball": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultraball.png",
-    // Ajoute d'autres balls ici
   };
   return balls[ballName] || "";
 }
@@ -199,39 +208,15 @@ document.querySelectorAll(".tab-button").forEach(btn => {
 });
 
 // Gestion filtres
-function creerFiltres() {
-  const filtresDiv = document.createElement("div");
-  filtresDiv.id = "filters";
+function remplirFiltres() {
+  // Remplir filtre jeux
+  const selectJeu = document.getElementById("filter-jeu");
+  const jeux = ["Tous", ...new Set(shinies.map(p => p.jeu).filter(j => j))];
+  selectJeu.innerHTML = jeux.map(j => `<option value="${j}">${j}</option>`).join("");
 
-  // Jeu
-  const jeux = ["Tous", ...new Set(shinies.map(p => p.jeu))];
-  const selectJeu = document.createElement("select");
-  selectJeu.id = "filtre-jeu";
-  selectJeu.innerHTML = jeux.map(j => `<option>${j}</option>`).join("");
-  filtresDiv.appendChild(creerLabelSelect("Jeu", selectJeu));
-  selectJeu.onchange = () => {
-    filtreJeu = selectJeu.value;
-    afficherShinies();
-  };
+  // Remplir filtre méthode
+  const selectMethode = document.getElementById("filter-methode");
+  const methodes = ["Tous", ...new Set(shinies.map(p => p.methode).filter(m => m))];
+  selectMethode.innerHTML = methodes.map(m => `<option value="${m}">${m}</option>`).join("");
 
-  // Méthode
-  const methodes = ["Tous", ...new Set(shinies.map(p => p.methode))];
-  const selectMethode = document.createElement("select");
-  selectMethode.id = "filtre-methode";
-  selectMethode.innerHTML = methodes.map(m => `<option>${m}</option>`).join("");
-  filtresDiv.appendChild(creerLabelSelect("Méthode", selectMethode));
-  selectM
-// Gestion des onglets
-document.querySelectorAll('.tab-button').forEach(button => {
-  button.addEventListener('click', () => {
-    const tab = button.dataset.tab;
-
-    // Retire la classe active de tous les boutons
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    // Cache tout le contenu
-    document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-
-    // Active le bon onglet
-    button.classList.add('active');
-    document.getElementById(tab).style.display = 'block';
-  });
+  // Remplir filtre type
