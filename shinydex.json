@@ -1,7 +1,0 @@
-[
-  { "numero": "001", "nom": "Bulbizarre", "versions": ["normal", "alola"], "type": ["Plante", "Poison"] },
-  { "numero": "019", "nom": "Rattata", "versions": ["normal", "alola"], "type": ["Normal"] },
-  { "numero": "045", "nom": "Rafflesia", "versions": ["normal"], "type": ["Plante", "Poison"] },
-  { "numero": "006", "nom": "Dracaufeu", "versions": ["normal", "mega"], "type": ["Feu", "Vol"] },
-  { "numero": "483", "nom": "Dialga", "versions": ["normal"], "type": ["Acier", "Dragon"] }
-]
