@@ -95,7 +95,6 @@
 <script>
   const TOTAL_POKEMON = 1010;
 
-  // Générer liste Pokémon (ex: Pokémon 1, Pokémon 2, ...)
   function generatePokemonList() {
     const container = document.getElementById('pokemonList');
     for(let i=1; i<=TOTAL_POKEMON; i++) {
@@ -107,21 +106,18 @@
     }
   }
 
-  // Met à jour le compteur et % 
   function updateStats() {
     const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
     const percent = ((checkedCount / TOTAL_POKEMON) * 100).toFixed(1);
     document.getElementById('stats').textContent = `Shinies obtenus : ${checkedCount} / ${TOTAL_POKEMON} (${percent}%)`;
   }
 
-  // Sauvegarde dans localStorage
   function saveProgress() {
     const checkedIds = [];
     document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => checkedIds.push(cb.dataset.id));
     localStorage.setItem('shinyDexProgress', JSON.stringify(checkedIds));
   }
 
-  // Charge la progression depuis localStorage
   function loadProgress() {
     const saved = localStorage.getItem('shinyDexProgress');
     if(saved) {
@@ -137,7 +133,6 @@
     }
   }
 
-  // Export JSON de la progression
   function exportProgress() {
     const saved = localStorage.getItem('shinyDexProgress') || "[]";
     const blob = new Blob([saved], {type: "application/json"});
@@ -149,16 +144,13 @@
     URL.revokeObjectURL(url);
   }
 
-  // Import JSON de la progression
   function importProgress(file) {
     const reader = new FileReader();
     reader.onload = e => {
       try {
         const data = JSON.parse(e.target.result);
         if(Array.isArray(data)) {
-          // Reset tout
           document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-          // Appliquer la progression importée
           data.forEach(id => {
             const cb = document.getElementById('p' + id);
             if(cb) cb.checked = true;
@@ -176,12 +168,10 @@
     reader.readAsText(file);
   }
 
-  // Initialisation
   generatePokemonList();
   loadProgress();
   updateStats();
 
-  // Événements
   document.getElementById('pokemonList').addEventListener('change', e => {
     if(e.target && e.target.matches('input[type="checkbox"]')) {
       updateStats();
@@ -193,7 +183,7 @@
 
   document.getElementById('importFile').addEventListener('change', e => {
     if(e.target.files.length) importProgress(e.target.files[0]);
-    e.target.value = ""; // reset input
+    e.target.value = "";
   });
 </script>
 </body>
