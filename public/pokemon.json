@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "nom": "Bulbizarre",
+    "types": ["Plante", "Poison"],
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png"
+  },
+  {
+    "id": 2,
+    "nom": "Herbizarre",
+    "types": ["Plante", "Poison"],
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png"
+  },
+  {
+    "id": 3,
+    "nom": "Florizarre",
+    "types": ["Plante", "Poison"],
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png"
+  },
+  {
+    "id": 4,
+    "nom": "Salamèche",
+    "types": ["Feu"],
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png"
+  },
+  {
+    "id": 5,
+    "nom": "Reptincel",
+    "types": ["Feu"],
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png"
+  },
+  {
+    "id": 6,
+    "nom": "Dracaufeu",
+    "types": ["Feu", "Vol"],
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png"
+  }
+]
