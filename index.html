@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShinyDex Personnalisé</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .card img {
+      display: block;
+      margin: 0 auto 1rem;
+      image-rendering: pixelated;
+    }
+    .field {
+      margin-bottom: 0.5rem;
+    }
+    .field label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>ShinyDex – Exemple 10 Pokémon</h1>
+  <div class="grid" id="dex"></div>
+
+  <script>
+    const pokemons = [
+      { id: 1, nom: "Bulbizarre", types: ["Plante", "Poison"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png", forme: "" },
+      { id: 2, nom: "Herbizarre", types: ["Plante", "Poison"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png", forme: "" },
+      { id: 3, nom: "Florizarre", types: ["Plante", "Poison"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png", forme: "" },
+      { id: 4, nom: "Salamèche", types: ["Feu"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png", forme: "" },
+      { id: 5, nom: "Reptincel", types: ["Feu"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png", forme: "" },
+      { id: 6, nom: "Dracaufeu", types: ["Feu", "Vol"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png", forme: "" },
+      { id: 7, nom: "Carapuce", types: ["Eau"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png", forme: "" },
+      { id: 8, nom: "Carabaffe", types: ["Eau"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/8.png", forme: "" },
+      { id: 9, nom: "Tortank", types: ["Eau"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/9.png", forme: "" },
+      { id: 25, nom: "Pikachu", types: ["Électrik"], sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png", forme: "" }
+    ];
+
+    const container = document.getElementById("dex");
+
+    pokemons.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${p.sprite}" width="96" height="96" alt="${p.nom}" />
+        <div class="field"><label>#${p.id} – ${p.nom}</label></div>
+        <div class="field"><label>Forme</label><input type="text" placeholder="Ex : Alola" /></div>
+        <div class="field"><label>Surnom</label><input type="text" placeholder="Surnom" /></div>
+        <div class="field"><label>Type(s)</label><input type="text" value="${p.types.join(" / ")}" disabled /></div>
+        <div class="field"><label>Ball</label>
+          <select>
+            <option>Poké Ball</option>
+            <option>Hyper Ball</option>
+            <option>Super Ball</option>
+            <option>Master Ball</option>
+            <option>Luxe Ball</option>
+          </select>
+        </div>
+        <div class="field"><label>Sexe</label>
+          <select>
+            <option>♂</option>
+            <option>♀</option>
+            <option>Inconnu</option>
+          </select>
+        </div>
+        <div class="field"><label>Jeu</label>
+          <select>
+            <option>Écarlate</option>
+            <option>Violet</option>
+            <option>Arceus</option>
+            <option>Let's Go</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="field"><label>Méthode</label>
+          <select>
+            <option>Rencontre</option>
+            <option>Masuda</option>
+            <option>Reset</option>
+            <option>Radar</option>
+            <option>Chaines</option>
+          </select>
+        </div>
+        <div class="field"><label>Rencontres</label><input type="number" min="0" value="0" /></div>
+        <div class="field"><label>Date d'obtention</label><input type="date" /></div>
+        <div class="field"><label><input type="checkbox" /> Capturé en shiny</label></div>
+      `;
+      container.appendChild(card);
+    });
+  </script>
+</body>
+</html>
