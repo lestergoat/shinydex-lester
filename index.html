@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShinyDex complet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f5;
+      margin: 0; padding: 1rem;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    #filters {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    button {
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover, button.active {
+      background: #357a38;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .list {
+      flex: 1 1 450px;
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .list h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+    .pokemon-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid #ddd;
+      padding: 0.5rem 0;
+    }
+    .pokemon-card:last-child {
+      border-bottom: none;
+    }
+    .pokemon-card img {
+      width: 72px;
+      height: 72px;
+      image-rendering: pixelated;
+    }
+    .pokemon-info {
+      flex-grow: 1;
+    }
+    .pokemon-info b {
+      font-size: 1.1rem;
+    }
+    .types {
+      font-size: 0.85rem;
+      color: #555;
+      margin-top: 0.2rem;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .controls label {
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    input[type="date"], input[type="text"], input[type="number"], select {
+      font-size: 0.9rem;
+      padding: 0.2rem 0.3rem;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    input[type="text"], select {
+      min-width: 120px;
+    }
+    /* Scrollbar styling */
+    .list::-webkit-scrollbar {
+      width: 8px;
+    }
+    .list::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ShinyDex complet</h1>
+
+  <div id="filters">
+    <button id="btn-all" class="active">Voir tout</button>
+    <button id="btn-to-get">À obtenir</button>
+    <button id="btn-captured">Capturés shiny</button>
+  </div>
+
+  <div class="container">
+    <section class="list" id="to-get-list">
+      <h2>Pokémon à obtenir</h2>
+      <div id="to-get-container"></div>
+    </section>
+
+    <section class="list" id="captured-list" style="display:none;">
+      <h2>Pokémon capturés shiny</h2>
+      <div id="captured-container"></div>
+    </section>
+  </div>
+// Récupération et sauvegarde locale (localStorage) par Pokémon ID
+const STORAGE_KEY = "shinydexData";
+
+let pokemonData = [];
+let shinyStatus = {}; // { [id]: {captured: bool, date: str, surnom: str, ball: str, sexe: str, jeu: str, methode: str, rencontres: number} }
+
+// Champs par défauts pour l'édition
+const defaultBall = "Poké Ball";
+const defaultSexe = "♂";
+const defaultJeu = "Écarlate";
+const defaultMethode = "Rencontre";
+
+// Elements DOM
+const toGetContainer = document.getElementById("to-get-container");
+const capturedContainer = document.getElementById("captured-container");
+
+const btnAll = document.getElementById("btn-all");
+const btnToGet = document.getElementById("btn-to-get");
+const btnCaptured = document.getElementById("btn-captured");
+
+// Chargement des données depuis localStorage
+function loadStorage() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw) {
+    shinyStatus = JSON.parse(raw);
+  }
+}
+
+// Sauvegarde dans localStorage
+function saveStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(shinyStatus));
+}
+
+// Crée une carte Pokémon
+function createPokemonCard(p, captured) {
+  const card = document.createElement("div");
+  card.className = "pokemon-card";
+
+  card.innerHTML = `
+    <img src="${p.sprite}" alt="${p.nom} shiny" />
+    <div class="pokemon-info">
+      <b>#${p.id} - ${p.nom}</b>
+      <div class="types">${p.types.join(" / ")}</div>
+      <div class="controls">
+        <label title="Capturé en shiny">
+          <input type="checkbox" class="captured-checkbox" ${captured ? "checked" : ""} />
+          Capturé
+        </label>
+        <label title="Date d'obtention">
+          📅 <input type="date" class="input-date" value="${(shinyStatus[p.id]?.date) || ''}" />
+        </label>
+        <label title="Surnom">
+          🏷️ <input type="text" class="input-surnom" placeholder="Surnom" value="${(shinyStatus[p.id]?.surnom) || ''}" />
+        </label>
+        <label title="Ball">
+          🎱
+          <select class="input-ball">
+            <option ${shinyStatus[p.id]?.ball === "Poké Ball" ? "selected" : ""}>Poké Ball</option>
+            <option ${shinyStatus[p.id]?.ball === "Super Ball" ? "selected" : ""}>Super Ball</option>
+            <option ${shinyStatus[p.id]?.ball === "Hyper Ball" ? "selected" : ""}>Hyper Ball</option>
+            <option ${shinyStatus[p.id]?.ball === "Master Ball" ? "selected" : ""}>Master Ball</option>
+            <option ${shinyStatus[p.id]?.ball === "Luxe Ball" ? "selected" : ""}>Luxe Ball</option>
+          </select>
+        </label>
+        <label title="Sexe">
+          ⚥
+          <select class="input-sexe">
+            <option ${shinyStatus[p.id]?.sexe === "♂" ? "selected" : ""}>♂</option>
+            <option ${shinyStatus[p.id]?.sexe === "♀" ? "selected" : ""}>♀</option>
+            <option ${shinyStatus[p.id]?.sexe === "Inconnu" ? "selected" : ""}>Inconnu</option>
+          </select>
+        </label>
+        <label title="Jeu">
+          🎮
+          <select class="input-jeu">
+            <option ${shinyStatus[p.id]?.jeu === "Écarlate" ? "selected" : ""}>Écarlate</option>
+            <option ${shinyStatus[p.id]?.jeu === "Violet" ? "selected" : ""}>Violet</option>
+            <option ${shinyStatus[p.id]?.jeu === "Arceus" ? "selected" : ""}>Arceus</option>
+            <option ${shinyStatus[p.id]?.jeu === "Let's Go" ? "selected" : ""}>Let's Go</option>
+            <option ${shinyStatus[p.id]?.jeu === "Autre" ? "selected" : ""}>Autre</option>
+          </select>
+        </label>
+        <label title="Méthode">
+          🎯
+          <select class="input-methode">
+            <option ${shinyStatus[p.id]?.methode === "Rencontre" ? "selected" : ""}>Rencontre</option>
+            <option ${shinyStatus[p.id]?.methode === "Masuda" ? "selected" : ""}>Masuda</option>
+            <option ${shinyStatus[p.id]?.methode === "Reset" ? "selected" : ""}>Reset</option>
+            <option ${shinyStatus[p.id]?.methode === "Radar" ? "selected" : ""}>Radar</option>
+            <option ${shinyStatus[p.id]?.methode === "Chaines" ? "selected" : ""}>Chaines</option>
+          </select>
+        </label>
+        <label title="Nombre de rencontres">
+          🔢 <input type="number" min="0" class="input-rencontres" value="${(shinyStatus[p.id]?.rencontres) || 0}" />
+        </label>
+      </div>
+    </div>
+  `;
+  // Gestion des événements sur les inputs
+  const checkbox = card.querySelector(".captured-checkbox");
+  const dateInput = card.querySelector(".input-date");
+  const surnomInput = card.querySelector(".input-surnom");
+  const ballSelect = card.querySelector(".input-ball");
+  const sexeSelect = card.querySelector(".input-sexe");
+  const jeuSelect = card.querySelector(".input-jeu");
+  const methodeSelect = card.querySelector(".input-methode");
+  const rencontresInput = card.querySelector(".input-rencontres");
+
+  checkbox.addEventListener("change", () => {
+    if(checkbox.checked) {
+      shinyStatus[p.id] = shinyStatus[p.id] || {};
+      shinyStatus[p.id].captured = true;
+    } else {
+      if(shinyStatus[p.id]) {
+        shinyStatus[p.id].captured = false;
+      }
+    }
+    saveStorage();
+    renderLists();
+  });
+
+  dateInput.addEventListener("change", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].date = dateInput.value;
+    saveStorage();
+  });
+
+  surnomInput.addEventListener("input", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].surnom = surnomInput.value;
+    saveStorage();
+  });
+
+  ballSelect.addEventListener("change", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].ball = ballSelect.value;
+    saveStorage();
+  });
+
+  sexeSelect.addEventListener("change", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].sexe = sexeSelect.value;
+    saveStorage();
+  });
+
+  jeuSelect.addEventListener("change", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].jeu = jeuSelect.value;
+    saveStorage();
+  });
+
+  methodeSelect.addEventListener("change", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].methode = methodeSelect.value;
+    saveStorage();
+  });
+
+  rencontresInput.addEventListener("input", () => {
+    shinyStatus[p.id] = shinyStatus[p.id] || {};
+    shinyStatus[p.id].rencontres = parseInt(rencontresInput.value) || 0;
+    saveStorage();
+  });
+
+  return card;
+}
+
+// Affichage des listes Pokémon
+function renderLists() {
+  toGetContainer.innerHTML = "";
+  capturedContainer.innerHTML = "";
+
+  pokemonData.forEach(p => {
+    const captured = shinyStatus[p.id]?.captured;
+    const card = createPokemonCard(p, captured);
+
+    if(captured) {
+      capturedContainer.appendChild(card);
+    } else {
+      toGetContainer.appendChild(card);
+    }
+  });
+
+  // Afficher ou cacher les sections selon le filtre actif
+  if(btnAll.classList.contains("active")) {
+    document.getElementById("to-get-list").style.display = "";
+    document.getElementById("captured-list").style.display = "";
+  } else if(btnToGet.classList.contains("active")) {
+    document.getElementById("to-get-list").style.display = "";
+    document.getElementById("captured-list").style.display = "none";
+  } else if(btnCaptured.classList.contains("active")) {
+    document.getElementById("to-get-list").style.display = "none";
+    document.getElementById("captured-list").style.display = "";
+  }
+}
+
+// Gestion des filtres boutons
+btnAll.addEventListener("click", () => {
+  btnAll.classList.add("active");
+  btnToGet.classList.remove("active");
+  btnCaptured.classList.remove("active");
+  renderLists();
+});
+btnToGet.addEventListener("click", () => {
+  btnAll.classList.remove("active");
+  btnToGet.classList.add("active");
+  btnCaptured.classList.remove("active");
+  renderLists();
+});
+btnCaptured.addEventListener("click", () => {
+  btnAll.classList.remove("active");
+  btnToGet.classList.remove("active");
+  btnCaptured.classList.add("active");
+  renderLists();
+});
+
+// Chargement du fichier JSON et initialisation
+fetch('/pokemon.json')
+  .then(response => response.json())
+  .then(data => {
+    pokemonData = data;
+    loadStorage();
+    renderLists();
+  })
+  .catch(error => {
+    console.error('Erreur lors du chargement du fichier pokemon.json:', error);
+  });
