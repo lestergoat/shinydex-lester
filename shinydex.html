@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shiny Dex Simple</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    background: #f7f9fc;
+    color: #333;
+  }
+  header {
+    background: #4a90e2;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.4rem;
+  }
+  main {
+    max-width: 600px;
+    margin: auto;
+    padding: 1rem;
+  }
+  #stats {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+  .pokemon-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(100px,1fr));
+    gap: 0.5rem;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    user-select: none;
+    font-size: 0.85rem;
+  }
+  label input[type="checkbox"] {
+    margin-right: 0.6rem;
+    transform: scale(1.2);
+  }
+  footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #777;
+    margin: 1rem 0;
+  }
+  button {
+    margin: 0.5rem 0.2rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button#exportBtn {
+    background: #4a90e2;
+    color: white;
+  }
+  button#importBtn {
+    background: #ccc;
+    color: #333;
+  }
+  input#importFile {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<header>Shiny Dex Simple - 1010 Pokémon</header>
+<main>
+  <div id="stats">Shinies obtenus : 0 / 1010 (0%)</div>
+  <div class="pokemon-list" id="pokemonList"></div>
+
+  <div style="text-align:center; margin-top:1rem;">
+    <button id="exportBtn">Exporter progression</button>
+    <label for="importFile" style="cursor:pointer; color:#4a90e2;">Importer progression</label>
+    <input type="file" id="importFile" accept="application/json" />
+  </div>
+</main>
+<footer>
+  <small>Simple Shiny Dex par ChatGPT • Sauvegarde locale dans ton navigateur</small>
+</footer>
+
+<script>
+  const TOTAL_POKEMON = 1010;
+
+  // Générer liste Pokémon (ex: Pokémon 1, Pokémon 2, ...)
+  function generatePokemonList() {
+    const container = document.getElementById('pokemonList');
+    for(let i=1; i<=TOTAL_POKEMON; i++) {
+      const label = document.createElement('label');
+      label.htmlFor = `p${i}`;
+      label.title = `Pokémon ${i}`;
+      label.innerHTML = `<input type="checkbox" id="p${i}" data-id="${i}" /> Pokémon ${i}`;
+      container.appendChild(label);
+    }
+  }
+
+  // Met à jour le compteur et % 
+  function updateStats() {
+    const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+    const percent = ((checkedCount / TOTAL_POKEMON) * 100).toFixed(1);
+    document.getElementById('stats').textContent = `Shinies obtenus : ${checkedCount} / ${TOTAL_POKEMON} (${percent}%)`;
+  }
+
+  // Sauvegarde dans localStorage
+  function saveProgress() {
+    const checkedIds = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => checkedIds.push(cb.dataset.id));
+    localStorage.setItem('shinyDexProgress', JSON.stringify(checkedIds));
+  }
+
+  // Charge la progression depuis localStorage
+  function loadProgress() {
+    const saved = localStorage.getItem('shinyDexProgress');
+    if(saved) {
+      try {
+        const checkedIds = JSON.parse(saved);
+        checkedIds.forEach(id => {
+          const cb = document.getElementById('p' + id);
+          if(cb) cb.checked = true;
+        });
+      } catch(e) {
+        console.error("Erreur chargement progression", e);
+      }
+    }
+  }
+
+  // Export JSON de la progression
+  function exportProgress() {
+    const saved = localStorage.getItem('shinyDexProgress') || "[]";
+    const blob = new Blob([saved], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'shiny_dex_progress.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Import JSON de la progression
+  function importProgress(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if(Array.isArray(data)) {
+          // Reset tout
+          document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+          // Appliquer la progression importée
+          data.forEach(id => {
+            const cb = document.getElementById('p' + id);
+            if(cb) cb.checked = true;
+          });
+          saveProgress();
+          updateStats();
+          alert("Progression importée avec succès !");
+        } else {
+          alert("Fichier invalide.");
+        }
+      } catch(e) {
+        alert("Erreur lecture fichier.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // Initialisation
+  generatePokemonList();
+  loadProgress();
+  updateStats();
+
+  // Événements
+  document.getElementById('pokemonList').addEventListener('change', e => {
+    if(e.target && e.target.matches('input[type="checkbox"]')) {
+      updateStats();
+      saveProgress();
+    }
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', exportProgress);
+
+  document.getElementById('importFile').addEventListener('change', e => {
+    if(e.target.files.length) importProgress(e.target.files[0]);
+    e.target.value = ""; // reset input
+  });
+</script>
+</body>
+</html>
